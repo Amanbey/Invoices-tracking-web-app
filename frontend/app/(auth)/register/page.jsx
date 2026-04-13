@@ -3,24 +3,24 @@ import AuthForm from "../../../components/auth/AuthForm";
 
 export default function RegisterPage() {
   return (
-    <section className="mx-auto max-w-lg rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-      <h1 className="text-2xl font-semibold">Create your account</h1>
-      <p className="mt-2 text-slate-600">
-        Track your clients, invoices, and payments in one place.
-      </p>
-      <div className="mt-6 rounded-lg border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-        Welcome to your new billing command center. Start with your details.
-      </div>
-      <AuthForm mode="register" />
-      <p className="mt-6 text-sm text-slate-600">
-        Already have an account?{" "}
-        <Link
-          className="font-medium text-slate-900 transition hover:text-slate-700"
-          href="/login"
-        >
-          Sign in
-        </Link>
-      </p>
-    </section>
+    <main className="flex min-h-screen items-center justify-center px-6 py-10">
+      <section className="ui-card w-full max-w-md rounded-3xl border border-slate-200 bg-white p-8 shadow-[0_30px_70px_-55px_rgba(15,23,42,0.8)]">
+        <p className="text-xs font-semibold uppercase tracking-[0.4em] text-slate-400">
+          Welcome
+        </p>
+        <h1 className="mt-3 text-3xl font-semibold text-slate-900">Sign Up</h1>
+        <p className="mt-2 text-sm text-slate-500">Hi, welcome to your workspace.</p>
+        <AuthForm mode="register" />
+        <p className="mt-6 text-sm text-slate-600">
+          Already have an account?{" "}
+          <Link
+            className="font-semibold text-slate-700 transition hover:text-slate-900 hover:underline"
+            href="/login"
+          >
+            Login
+          </Link>
+        </p>
+      </section>
+    </main>
   );
 }

@@ -1,69 +1,119 @@
-const resolveApiBase = () => {
+const resolveApiBases = () => {
   if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
+    return [process.env.NEXT_PUBLIC_API_URL];
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "NEXT_PUBLIC_API_URL is required in production and must point to the deployed backend"
+    );
   }
 
   if (typeof window !== "undefined" && window.location?.hostname) {
-    return `http://${window.location.hostname}:5001`;
+    const host = window.location.hostname;
+    return [
+      `http://${host}:5001`,
+      `http://${host}:5002`,
+      `http://${host}:5003`,
+    ];
   }
 
-  return "http://localhost:5001";
+  return ["http://localhost:5001", "http://localhost:5002", "http://localhost:5003"];
 };
 
-export const API_BASE = resolveApiBase();
+export const API_BASES = resolveApiBases();
+export const API_BASE = API_BASES[0];
+let activeApiBase = API_BASE;
 
 const request = async (path, options = {}) => {
-  let response;
+  const mergedHeaders = {
+    "Content-Type": "application/json",
+    ...(options.headers || {}),
+  };
 
-  try {
-    const mergedHeaders = {
-      "Content-Type": "application/json",
-      ...(options.headers || {}),
-    };
+  let lastConnectionError = null;
 
-    response = await fetch(`${API_BASE}${path}`, {
-      ...options,
-      headers: mergedHeaders,
-    });
-  } catch (error) {
+  for (const base of API_BASES) {
+    let response;
+
+    try {
+      response = await fetch(`${base}${path}`, {
+        ...options,
+        headers: mergedHeaders,
+      });
+    } catch (error) {
+      lastConnectionError = error;
+      continue;
+    }
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.message || "Request failed");
+    }
+
+    activeApiBase = base;
+
+    return data;
+  }
+
+  if (lastConnectionError) {
     throw new Error("Unable to reach the API server.");
   }
 
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(data.message || "Request failed");
-  }
-
-  return data;
+  throw new Error("Request failed");
 };
 
 const requestForm = async (path, options = {}) => {
-  let response;
+  let lastConnectionError = null;
 
-  try {
-    response = await fetch(`${API_BASE}${path}`, {
-      ...options,
-    });
-  } catch (error) {
+  for (const base of API_BASES) {
+    let response;
+
+    try {
+      response = await fetch(`${base}${path}`, {
+        ...options,
+      });
+    } catch (error) {
+      lastConnectionError = error;
+      continue;
+    }
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.message || "Request failed");
+    }
+
+    activeApiBase = base;
+
+    return data;
+  }
+
+  if (lastConnectionError) {
     throw new Error("Unable to reach the API server.");
   }
 
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(data.message || "Request failed");
-  }
-
-  return data;
+  throw new Error("Request failed");
 };
 
-export const getAssetUrl = (path) => {
+export const getAssetUrl = (path, cacheKey) => {
   if (!path) {
     return "";
   }
   if (path.startsWith("http://") || path.startsWith("https://")) {
-    return path;
+    if (cacheKey === undefined || cacheKey === null || cacheKey === "") {
+      return path;
+    }
+    const separator = path.includes("?") ? "&" : "?";
+    return `${path}${separator}v=${encodeURIComponent(cacheKey)}`;
   }
-  return `${API_BASE}${path}`;
+
+  const baseUrl = `${activeApiBase}${path}`;
+  if (cacheKey === undefined || cacheKey === null || cacheKey === "") {
+    return baseUrl;
+  }
+
+  const separator = baseUrl.includes("?") ? "&" : "?";
+  return `${baseUrl}${separator}v=${encodeURIComponent(cacheKey)}`;
 };
 
 export const registerUser = (payload) =>
@@ -108,6 +158,14 @@ export const updateInvoice = (token, invoiceId, payload) =>
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(payload),
+  });
+
+export const deleteInvoice = (token, invoiceId) =>
+  request(`/api/invoices/${invoiceId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
 
 export const updateProfile = (token, formData) =>

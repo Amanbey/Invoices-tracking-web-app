@@ -198,11 +198,16 @@ export default function ClientsPage() {
     }
 
     setIsSaving(true);
+    setErrorMessage("");
 
     try {
       await deleteClient(token, clientId);
       setClients((prev) => prev.filter((client) => client._id !== clientId));
     } catch (error) {
+      if (error.message === "Cannot delete a client with existing invoices") {
+        setErrorMessage("This client has invoices. Delete those invoices first.");
+        return;
+      }
       setErrorMessage(error.message || "Unable to delete client.");
     } finally {
       setIsSaving(false);
@@ -224,7 +229,7 @@ export default function ClientsPage() {
         className="pointer-events-none absolute right-6 top-24 h-72 w-72 rounded-full bg-sky-200/40 blur-3xl"
       />
 
-      <header className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white/80 p-8 shadow-sm backdrop-blur">
+      <header className="ui-card relative overflow-hidden rounded-3xl border border-slate-200 bg-white/80 p-8 shadow-sm backdrop-blur">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
@@ -262,7 +267,7 @@ export default function ClientsPage() {
 
       {isFormOpen && (
         <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-slate-900/30 px-4 py-10 backdrop-blur-sm">
-          <div className="w-full max-w-2xl rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_30px_80px_-50px_rgba(15,23,42,0.8)]">
+          <div className="ui-card w-full max-w-2xl rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_30px_80px_-50px_rgba(15,23,42,0.8)]">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-slate-900">
@@ -383,8 +388,8 @@ export default function ClientsPage() {
         </div>
       )}
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+      <section className="ui-card rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div>
               <h2 className="text-xl font-semibold text-slate-900">
                 <span className="font-display">Client directory</span>
@@ -412,192 +417,192 @@ export default function ClientsPage() {
             </div>
           </div>
 
-          {isLoading && (
-            <p className="mt-6 text-sm text-slate-500">Loading clients...</p>
-          )}
-          {!isLoading && filteredClients.length === 0 && (
-            <p className="mt-6 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-500">
-              No clients yet. Add your first client to get started.
-            </p>
-          )}
+        {isLoading && (
+          <p className="mt-6 text-sm text-slate-500">Loading clients...</p>
+        )}
+        {!isLoading && filteredClients.length === 0 && (
+          <p className="mt-6 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-500">
+            No clients yet. Add your first client to get started.
+          </p>
+        )}
 
-          <div className="mt-6 overflow-hidden rounded-2xl border border-slate-100">
-            <div className="grid grid-cols-1 gap-0 border-b border-slate-100 bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 md:grid-cols-[1.2fr_1.2fr_0.6fr_0.6fr]">
-              <span>Name</span>
-              <span>Contact</span>
-              <span>Status</span>
-              <span>Actions</span>
-            </div>
-            <div className="divide-y divide-slate-100">
-              {filteredClients.map((client) => (
-                <div
-                  key={client._id}
-                  className="grid grid-cols-1 gap-4 px-4 py-4 text-sm text-slate-700 transition hover:bg-slate-50/70 md:grid-cols-[1.2fr_1.2fr_0.6fr_0.6fr]"
-                >
-                  {editingId === client._id ? (
-                    <div className="md:col-span-4">
-                      <div className="grid gap-3 md:grid-cols-2">
-                        <label
-                          className="flex flex-col gap-2 text-xs font-semibold text-slate-600"
-                          htmlFor={`edit-name-${client._id}`}
+        <div className="mt-6 overflow-hidden rounded-2xl border border-slate-100">
+          <div className="grid grid-cols-1 gap-0 border-b border-slate-100 bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 md:grid-cols-[1.2fr_1.2fr_0.6fr_0.6fr]">
+            <span>Name</span>
+            <span>Contact</span>
+            <span>Status</span>
+            <span>Actions</span>
+          </div>
+          <div className="divide-y divide-slate-100">
+            {filteredClients.map((client) => (
+              <div
+                key={client._id}
+                className="ui-card grid grid-cols-1 gap-4 px-4 py-4 text-sm text-slate-700 transition hover:bg-slate-50/70 md:grid-cols-[1.2fr_1.2fr_0.6fr_0.6fr]"
+              >
+                {editingId === client._id ? (
+                  <div className="md:col-span-4">
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <label
+                        className="flex flex-col gap-2 text-xs font-semibold text-slate-600"
+                        htmlFor={`edit-name-${client._id}`}
+                      >
+                        Name
+                        <input
+                          id={`edit-name-${client._id}`}
+                          className={compactInputClassName}
+                          name="name"
+                          value={editingValues.name}
+                          onChange={handleEditChange}
+                        />
+                      </label>
+                      <label
+                        className="flex flex-col gap-2 text-xs font-semibold text-slate-600"
+                        htmlFor={`edit-email-${client._id}`}
+                      >
+                        Email
+                        <input
+                          id={`edit-email-${client._id}`}
+                          className={compactInputClassName}
+                          name="email"
+                          value={editingValues.email}
+                          onChange={handleEditChange}
+                        />
+                      </label>
+                      <label
+                        className="flex flex-col gap-2 text-xs font-semibold text-slate-600"
+                        htmlFor={`edit-phone-${client._id}`}
+                      >
+                        Phone
+                        <input
+                          id={`edit-phone-${client._id}`}
+                          className={compactInputClassName}
+                          name="phone"
+                          value={editingValues.phone}
+                          onChange={handleEditChange}
+                        />
+                      </label>
+                      <label
+                        className="flex flex-col gap-2 text-xs font-semibold text-slate-600"
+                        htmlFor={`edit-address-${client._id}`}
+                      >
+                        Address
+                        <input
+                          id={`edit-address-${client._id}`}
+                          className={compactInputClassName}
+                          name="address"
+                          value={editingValues.address}
+                          onChange={handleEditChange}
+                        />
+                      </label>
+                      <label
+                        className="flex flex-col gap-2 text-xs font-semibold text-slate-600"
+                        htmlFor={`edit-status-${client._id}`}
+                      >
+                        Status
+                        <select
+                          id={`edit-status-${client._id}`}
+                          className={compactInputClassName}
+                          name="status"
+                          value={editingValues.status}
+                          onChange={handleEditChange}
                         >
-                          Name
-                          <input
-                            id={`edit-name-${client._id}`}
-                            className={compactInputClassName}
-                            name="name"
-                            value={editingValues.name}
-                            onChange={handleEditChange}
-                          />
-                        </label>
-                        <label
-                          className="flex flex-col gap-2 text-xs font-semibold text-slate-600"
-                          htmlFor={`edit-email-${client._id}`}
-                        >
-                          Email
-                          <input
-                            id={`edit-email-${client._id}`}
-                            className={compactInputClassName}
-                            name="email"
-                            value={editingValues.email}
-                            onChange={handleEditChange}
-                          />
-                        </label>
-                        <label
-                          className="flex flex-col gap-2 text-xs font-semibold text-slate-600"
-                          htmlFor={`edit-phone-${client._id}`}
-                        >
-                          Phone
-                          <input
-                            id={`edit-phone-${client._id}`}
-                            className={compactInputClassName}
-                            name="phone"
-                            value={editingValues.phone}
-                            onChange={handleEditChange}
-                          />
-                        </label>
-                        <label
-                          className="flex flex-col gap-2 text-xs font-semibold text-slate-600"
-                          htmlFor={`edit-address-${client._id}`}
-                        >
-                          Address
-                          <input
-                            id={`edit-address-${client._id}`}
-                            className={compactInputClassName}
-                            name="address"
-                            value={editingValues.address}
-                            onChange={handleEditChange}
-                          />
-                        </label>
-                        <label
-                          className="flex flex-col gap-2 text-xs font-semibold text-slate-600"
-                          htmlFor={`edit-status-${client._id}`}
-                        >
-                          Status
-                          <select
-                            id={`edit-status-${client._id}`}
-                            className={compactInputClassName}
-                            name="status"
-                            value={editingValues.status}
-                            onChange={handleEditChange}
-                          >
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                          </select>
-                        </label>
-                        <label
-                          className="md:col-span-2 flex flex-col gap-2 text-xs font-semibold text-slate-600"
-                          htmlFor={`edit-notes-${client._id}`}
-                        >
-                          Notes
-                          <textarea
-                            id={`edit-notes-${client._id}`}
-                            className={textareaClassName}
-                            name="notes"
-                            value={editingValues.notes}
-                            onChange={handleEditChange}
-                          />
-                        </label>
-                        <div className="md:col-span-2 flex flex-wrap gap-3">
-                          <button
-                            className="rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-800"
-                            type="button"
-                            onClick={() => handleUpdate(client._id)}
-                            disabled={isSaving}
-                          >
-                            Save changes
-                          </button>
-                          <button
-                            className="rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-400"
-                            type="button"
-                            onClick={cancelEdit}
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900">
-                          {client.name}
-                        </p>
-                        {client.company && (
-                          <p className="text-xs text-slate-500">
-                            {client.company}
-                          </p>
-                        )}
-                        {client.address && (
-                          <p className="text-xs text-slate-500">
-                            {client.address}
-                          </p>
-                        )}
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-xs text-slate-500">Email</p>
-                        <p className="text-sm font-medium text-slate-800">
-                          {client.email || "No email"}
-                        </p>
-                        <p className="text-xs text-slate-500">Phone</p>
-                        <p className="text-sm font-medium text-slate-800">
-                          {client.phone || "No phone"}
-                        </p>
-                      </div>
-                      <div>
-                        <span
-                          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                            client.status === "inactive"
-                              ? "bg-slate-200 text-slate-700"
-                              : "bg-emerald-100 text-emerald-700"
-                          }`}
-                        >
-                          {client.status === "inactive" ? "Inactive" : "Active"}
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
+                          <option value="active">Active</option>
+                          <option value="inactive">Inactive</option>
+                        </select>
+                      </label>
+                      <label
+                        className="md:col-span-2 flex flex-col gap-2 text-xs font-semibold text-slate-600"
+                        htmlFor={`edit-notes-${client._id}`}
+                      >
+                        Notes
+                        <textarea
+                          id={`edit-notes-${client._id}`}
+                          className={textareaClassName}
+                          name="notes"
+                          value={editingValues.notes}
+                          onChange={handleEditChange}
+                        />
+                      </label>
+                      <div className="md:col-span-2 flex flex-wrap gap-3">
                         <button
-                          className="rounded-full border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-400"
+                          className="rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-800"
                           type="button"
-                          onClick={() => startEdit(client)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="rounded-full border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm font-semibold text-rose-600 shadow-sm transition hover:border-rose-300"
-                          type="button"
-                          onClick={() => handleDelete(client._id)}
+                          onClick={() => handleUpdate(client._id)}
                           disabled={isSaving}
                         >
-                          Delete
+                          Save changes
+                        </button>
+                        <button
+                          className="rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-400"
+                          type="button"
+                          onClick={cancelEdit}
+                        >
+                          Cancel
                         </button>
                       </div>
-                    </>
-                  )}
-                </div>
-              ))}
-            </div>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">
+                        {client.name}
+                      </p>
+                      {client.company && (
+                        <p className="text-xs text-slate-500">
+                          {client.company}
+                        </p>
+                      )}
+                      {client.address && (
+                        <p className="text-xs text-slate-500">
+                          {client.address}
+                        </p>
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-slate-500">Email</p>
+                      <p className="text-sm font-medium text-slate-800">
+                        {client.email || "No email"}
+                      </p>
+                      <p className="text-xs text-slate-500">Phone</p>
+                      <p className="text-sm font-medium text-slate-800">
+                        {client.phone || "No phone"}
+                      </p>
+                    </div>
+                    <div>
+                      <span
+                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                          client.status === "inactive"
+                            ? "bg-slate-200 text-slate-700"
+                            : "bg-emerald-100 text-emerald-700"
+                        }`}
+                      >
+                        {client.status === "inactive" ? "Inactive" : "Active"}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        className="h-7 rounded-[10px] bg-slate-900 px-3 text-[11px] font-semibold text-white transition-all duration-200 hover:bg-slate-800 hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2"
+                        type="button"
+                        onClick={() => startEdit(client)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="h-7 rounded-[10px] bg-rose-600 px-3 text-[11px] font-semibold text-white transition-all duration-200 hover:bg-rose-700 hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-rose-300 focus:ring-offset-2"
+                        type="button"
+                        onClick={() => handleDelete(client._id)}
+                        disabled={isSaving}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
           </div>
+        </div>
       </section>
     </div>
   );

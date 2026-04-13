@@ -66,7 +66,7 @@ export default function Navbar() {
   }, [isMenuOpen]);
 
   const avatarUrl = useMemo(
-    () => getAssetUrl(user?.avatarUrl || ""),
+    () => getAssetUrl(user?.avatarUrl || "", user?.updatedAt || ""),
     [user]
   );
 
@@ -95,7 +95,7 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur transition-shadow duration-200 hover:shadow-sm">
       <div className="mx-auto flex w-full max-w-6xl items-center px-6 py-4">
         <Link className="flex items-center gap-3" href="/dashboard">
           <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-900 text-sm font-semibold text-white">

@@ -122,7 +122,7 @@ export default function NewInvoicePage() {
         className="pointer-events-none absolute left-6 top-32 h-72 w-72 rounded-full bg-sky-200/40 blur-3xl"
       />
 
-      <header className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white/80 p-8 shadow-sm backdrop-blur">
+      <header className="ui-card relative overflow-hidden rounded-3xl border border-slate-200 bg-white/80 p-8 shadow-sm backdrop-blur">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
@@ -146,7 +146,7 @@ export default function NewInvoicePage() {
       </header>
 
       <form
-        className="rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.8)]"
+        className="ui-card rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.8)]"
         onSubmit={handleSubmit}
       >
         <div className="grid gap-6 md:grid-cols-2">

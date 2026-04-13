@@ -19,3 +19,35 @@ body {
 .font-display {
   font-family: var(--font-display);
 }
+
+@layer base {
+  button {
+    @apply transition-all duration-200;
+  }
+
+  button:disabled {
+    @apply cursor-not-allowed opacity-60;
+  }
+
+  button:not(:disabled):hover {
+    @apply -translate-y-0.5;
+  }
+
+  input,
+  select,
+  textarea {
+    @apply transition-colors duration-200;
+  }
+
+  input:hover,
+  select:hover,
+  textarea:hover {
+    @apply border-slate-300;
+  }
+}
+
+@layer components {
+  .ui-card {
+    @apply transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_26px_60px_-35px_rgba(15,23,42,0.6)];
+  }
+}

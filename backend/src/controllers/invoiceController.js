@@ -24,7 +24,6 @@ exports.createInvoice = async (req, res, next) => {
   try {
     const {
       clientId,
-      clientName,
       invoiceNumber,
       productType,
       amount,
@@ -38,26 +37,24 @@ exports.createInvoice = async (req, res, next) => {
     const issuedDate = new Date(issuedAt);
     const dueDate = new Date(dueAt);
 
-    let resolvedClientName = clientName?.trim();
+    let resolvedClientName;
     let resolvedClientId;
 
-    if (clientId) {
-      const client = await Client.findOne({
-        _id: clientId,
-        user: req.user._id,
-      });
-
-      if (!client) {
-        throw new ErrorResponse("Client not found", 404);
-      }
-
-      resolvedClientId = client._id;
-      resolvedClientName = client.name;
+    if (!clientId) {
+      throw new ErrorResponse("Select a valid client", 400);
     }
 
-    if (!resolvedClientName) {
-      throw new ErrorResponse("Client name is required", 400);
+    const client = await Client.findOne({
+      _id: clientId,
+      user: req.user._id,
+    });
+
+    if (!client) {
+      throw new ErrorResponse("Client not found", 404);
     }
+
+    resolvedClientId = client._id;
+    resolvedClientName = client.name;
 
     if (!productType?.trim()) {
       throw new ErrorResponse("Product type is required", 400);
@@ -154,6 +151,25 @@ exports.updateInvoice = async (req, res, next) => {
 
     const savedInvoice = await invoice.save();
     res.status(200).json({ invoice: savedInvoice });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteInvoice = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const deletedInvoice = await Invoice.findOneAndDelete({
+      _id: id,
+      user: req.user._id,
+    });
+
+    if (!deletedInvoice) {
+      throw new ErrorResponse("Invoice not found", 404);
+    }
+
+    res.status(200).json({ message: "Invoice deleted" });
   } catch (error) {
     next(error);
   }

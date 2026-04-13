@@ -2,6 +2,12 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const ErrorResponse = require("../utils/errorResponse");
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const validatePassword = (password = "") => {
+  return password.length >= 8 && /[A-Za-z]/.test(password) && /\d/.test(password);
+};
+
 const createToken = (userId) => {
   const secret = process.env.JWT_SECRET;
   if (!secret) {
@@ -19,12 +25,28 @@ exports.register = async (req, res, next) => {
       throw new ErrorResponse("Name, email, and password are required", 400);
     }
 
-    const existing = await User.findOne({ email });
+    if (!emailRegex.test(email.trim())) {
+      throw new ErrorResponse("Enter a valid email address", 400);
+    }
+
+    if (!validatePassword(password)) {
+      throw new ErrorResponse(
+        "Password must be at least 8 characters and include letters and numbers",
+        400
+      );
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const existing = await User.findOne({ email: normalizedEmail });
     if (existing) {
       throw new ErrorResponse("Email already in use", 409);
     }
 
-    const user = await User.create({ name, email, password });
+    const user = await User.create({
+      name: name.trim(),
+      email: normalizedEmail,
+      password,
+    });
     const token = createToken(user._id);
 
     res.status(201).json({
@@ -48,7 +70,12 @@ exports.login = async (req, res, next) => {
       throw new ErrorResponse("Email and password are required", 400);
     }
 
-    const user = await User.findOne({ email });
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!emailRegex.test(normalizedEmail)) {
+      throw new ErrorResponse("Enter a valid email address", 400);
+    }
+
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
       throw new ErrorResponse("Invalid credentials", 401);
     }

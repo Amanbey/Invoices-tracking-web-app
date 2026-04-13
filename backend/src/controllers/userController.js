@@ -1,7 +1,33 @@
 const User = require("../models/User");
+const fs = require("fs");
+const path = require("path");
 const ErrorResponse = require("../utils/errorResponse");
 
 const buildAvatarUrl = (filename) => `/uploads/avatars/${filename}`;
+
+const removeOldAvatarIfLocal = (avatarUrl) => {
+  if (!avatarUrl || !avatarUrl.startsWith("/uploads/avatars/")) {
+    return;
+  }
+
+  const filename = avatarUrl.split("/").pop();
+  if (!filename) {
+    return;
+  }
+
+  const filePath = path.join(
+    __dirname,
+    "..",
+    "..",
+    "uploads",
+    "avatars",
+    filename
+  );
+
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+  }
+};
 
 exports.getProfile = async (req, res, next) => {
   try {
@@ -13,6 +39,7 @@ exports.getProfile = async (req, res, next) => {
 
 exports.updateProfile = async (req, res, next) => {
   try {
+    const previousAvatarUrl = req.user.avatarUrl;
     const { name, email } = req.body;
 
     if (name !== undefined && !name.trim()) {
@@ -52,6 +79,10 @@ exports.updateProfile = async (req, res, next) => {
 
     if (!user) {
       throw new ErrorResponse("User not found", 404);
+    }
+
+    if (req.file && previousAvatarUrl && previousAvatarUrl !== user.avatarUrl) {
+      removeOldAvatarIfLocal(previousAvatarUrl);
     }
 
     res.status(200).json({ user });

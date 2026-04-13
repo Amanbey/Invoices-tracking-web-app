@@ -24,6 +24,13 @@ exports.protect = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
+    if (
+      error.name === "TokenExpiredError" ||
+      error.name === "JsonWebTokenError"
+    ) {
+      next(new ErrorResponse("Not authorized", 401));
+      return;
+    }
     next(error);
   }
 };

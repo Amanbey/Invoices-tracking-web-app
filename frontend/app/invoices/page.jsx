@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getInvoices, updateInvoice } from "../../lib/api";
+import { deleteInvoice, getInvoices, updateInvoice } from "../../lib/api";
 
 const currency = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -30,6 +30,7 @@ export default function InvoicesPage() {
     notes: "",
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeletingId, setIsDeletingId] = useState(null);
 
   const inputClassName =
     "rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200";
@@ -188,6 +189,34 @@ export default function InvoicesPage() {
     }
   };
 
+  const handleDelete = async (invoiceId) => {
+    const confirmed = window.confirm("Delete this invoice?");
+    if (!confirmed) {
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.replace("/register");
+      return;
+    }
+
+    setIsDeletingId(invoiceId);
+    setErrorMessage("");
+
+    try {
+      await deleteInvoice(token, invoiceId);
+      setInvoices((prev) => prev.filter((invoice) => invoice._id !== invoiceId));
+      if (editingId === invoiceId) {
+        cancelEdit();
+      }
+    } catch (error) {
+      setErrorMessage(error.message || "Unable to delete invoice.");
+    } finally {
+      setIsDeletingId(null);
+    }
+  };
+
   return (
     <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-8">
       <div
@@ -199,7 +228,7 @@ export default function InvoicesPage() {
         className="pointer-events-none absolute right-6 top-24 h-72 w-72 rounded-full bg-sky-200/40 blur-3xl"
       />
 
-      <header className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white/80 p-8 shadow-sm backdrop-blur">
+      <header className="ui-card relative overflow-hidden rounded-3xl border border-slate-200 bg-white/80 p-8 shadow-sm backdrop-blur">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
@@ -230,7 +259,7 @@ export default function InvoicesPage() {
         </div>
       </header>
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="ui-card rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-col gap-2">
             <h2 className="text-xl font-semibold text-slate-900">
@@ -277,7 +306,7 @@ export default function InvoicesPage() {
         )}
 
         <div className="mt-6 overflow-hidden rounded-2xl border border-slate-100">
-          <div className="grid grid-cols-1 gap-0 border-b border-slate-100 bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 md:grid-cols-[1.1fr_1fr_0.8fr_0.8fr_0.7fr_0.7fr]">
+          <div className="grid grid-cols-1 gap-0 border-b border-slate-100 bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 md:grid-cols-[1.1fr_1fr_0.8fr_0.8fr_0.7fr_1fr]">
             <span>Client</span>
             <span>Invoice</span>
             <span>Issued</span>
@@ -288,7 +317,7 @@ export default function InvoicesPage() {
           <div className="divide-y divide-slate-100">
             {filteredInvoices.map((invoice) => (
               <div key={invoice._id} className="grid grid-cols-1">
-                <div className="grid grid-cols-1 gap-3 px-4 py-4 text-sm text-slate-700 transition hover:bg-slate-50/70 md:grid-cols-[1.1fr_1fr_0.8fr_0.8fr_0.7fr_0.7fr]">
+                <div className="ui-card grid grid-cols-1 gap-3 px-4 py-4 text-sm text-slate-700 transition hover:bg-slate-50/70 md:grid-cols-[1.1fr_1fr_0.8fr_0.8fr_0.7fr_1fr]">
                   <div>
                     <p className="font-semibold text-slate-900">
                       {invoice.client?.name || invoice.clientName}
@@ -320,7 +349,7 @@ export default function InvoicesPage() {
                       {formatStatus(invoice.status)}
                     </span>
                   </div>
-                  <div>
+                  <div className="flex flex-wrap gap-2">
                     <button
                       className="rounded-full border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-slate-400 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-400"
                       type="button"
@@ -329,11 +358,19 @@ export default function InvoicesPage() {
                     >
                       {invoice.status === "paid" ? "Locked" : "Edit"}
                     </button>
+                    <button
+                      className="rounded-full border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:border-rose-300 disabled:cursor-not-allowed disabled:border-rose-100 disabled:text-rose-300"
+                      type="button"
+                      onClick={() => handleDelete(invoice._id)}
+                      disabled={isDeletingId === invoice._id}
+                    >
+                      {isDeletingId === invoice._id ? "Deleting" : "Delete"}
+                    </button>
                   </div>
                 </div>
 
                 {editingId === invoice._id && (
-                  <div className="border-t border-slate-100 bg-white px-4 py-5">
+                  <div className="ui-card border-t border-slate-100 bg-white px-4 py-5">
                     <div className="grid gap-4 md:grid-cols-2">
                       <label className="flex flex-col gap-2 text-xs font-semibold text-slate-600" htmlFor={`edit-invoice-${invoice._id}`}>
                         Invoice number

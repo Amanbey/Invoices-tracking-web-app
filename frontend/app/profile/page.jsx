@@ -16,6 +16,7 @@ export default function ProfilePage() {
     name: "",
     email: "",
     avatarUrl: "",
+    avatarUpdatedAt: "",
   });
   const [avatarFile, setAvatarFile] = useState(null);
 
@@ -34,6 +35,7 @@ export default function ProfilePage() {
             name: data.user.name || "",
             email: data.user.email || "",
             avatarUrl: data.user.avatarUrl || "",
+            avatarUpdatedAt: data.user.updatedAt || "",
           });
           setIsReady(true);
           return;
@@ -53,8 +55,8 @@ export default function ProfilePage() {
     if (avatarFile) {
       return URL.createObjectURL(avatarFile);
     }
-    return getAssetUrl(profile.avatarUrl || "");
-  }, [avatarFile, profile.avatarUrl]);
+    return getAssetUrl(profile.avatarUrl || "", profile.avatarUpdatedAt);
+  }, [avatarFile, profile.avatarUrl, profile.avatarUpdatedAt]);
 
   const initials = profile.name
     ? profile.name
@@ -91,6 +93,7 @@ export default function ProfilePage() {
           name: data.user.name || "",
           email: data.user.email || "",
           avatarUrl: data.user.avatarUrl || "",
+          avatarUpdatedAt: data.user.updatedAt || Date.now().toString(),
         });
         localStorage.setItem("user", JSON.stringify(data.user));
         window.dispatchEvent(new Event("profile-updated"));
@@ -111,7 +114,7 @@ export default function ProfilePage() {
 
   return (
     <div className="relative mx-auto flex w-full max-w-5xl flex-col gap-8">
-      <header className="rounded-3xl border border-slate-200 bg-white/80 p-8 shadow-sm backdrop-blur">
+      <header className="ui-card rounded-3xl border border-slate-200 bg-white/80 p-8 shadow-sm backdrop-blur">
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
           Profile
         </p>
@@ -124,11 +127,11 @@ export default function ProfilePage() {
       </header>
 
       <form
-        className="rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.8)]"
+        className="ui-card rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.8)]"
         onSubmit={handleSubmit}
       >
         <div className="grid gap-6 lg:grid-cols-[0.7fr_1fr]">
-          <div className="flex flex-col items-center gap-4 rounded-2xl border border-slate-100 bg-slate-50/60 p-6 text-center">
+          <div className="ui-card flex flex-col items-center gap-4 rounded-2xl border border-slate-100 bg-slate-50/60 p-6 text-center">
             <div className="relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-slate-200 text-2xl font-semibold text-slate-700">
               {avatarPreview ? (
                 <img

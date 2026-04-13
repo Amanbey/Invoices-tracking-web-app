@@ -1,4 +1,5 @@
 const Client = require("../models/Client");
+const Invoice = require("../models/Invoice");
 const ErrorResponse = require("../utils/errorResponse");
 
 exports.listClients = async (req, res, next) => {
@@ -74,6 +75,19 @@ exports.updateClient = async (req, res, next) => {
 exports.deleteClient = async (req, res, next) => {
   try {
     const { id } = req.params;
+
+    const linkedInvoice = await Invoice.findOne({
+      user: req.user._id,
+      client: id,
+    }).select("_id");
+
+    if (linkedInvoice) {
+      throw new ErrorResponse(
+        "Cannot delete a client with existing invoices",
+        409
+      );
+    }
+
     const deletedClient = await Client.findOneAndDelete({
       _id: id,
       user: req.user._id,
