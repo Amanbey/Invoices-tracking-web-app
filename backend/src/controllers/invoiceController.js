@@ -1,4 +1,5 @@
 const Invoice = require("../models/Invoice");
+const Client = require("../models/Client");
 const ErrorResponse = require("../utils/errorResponse");
 
 const generateInvoiceNumber = () => {
@@ -9,13 +10,9 @@ const generateInvoiceNumber = () => {
 exports.listInvoices = async (req, res, next) => {
   try {
     const userId = req.user._id;
-    const invoices = await Invoice.find({
-      $or: [
-        { user: userId },
-        { user: userId.toString() },
-        { user: { $exists: false } },
-      ],
-    }).sort({ createdAt: -1 });
+    const invoices = await Invoice.find({ user: userId })
+      .populate("client", "name email company")
+      .sort({ createdAt: -1 });
 
     res.status(200).json({ invoices });
   } catch (error) {
@@ -26,6 +23,7 @@ exports.listInvoices = async (req, res, next) => {
 exports.createInvoice = async (req, res, next) => {
   try {
     const {
+      clientId,
       clientName,
       invoiceNumber,
       amount,
@@ -39,7 +37,24 @@ exports.createInvoice = async (req, res, next) => {
     const issuedDate = new Date(issuedAt);
     const dueDate = new Date(dueAt);
 
-    if (!clientName?.trim()) {
+    let resolvedClientName = clientName?.trim();
+    let resolvedClientId;
+
+    if (clientId) {
+      const client = await Client.findOne({
+        _id: clientId,
+        user: req.user._id,
+      });
+
+      if (!client) {
+        throw new ErrorResponse("Client not found", 404);
+      }
+
+      resolvedClientId = client._id;
+      resolvedClientName = client.name;
+    }
+
+    if (!resolvedClientName) {
       throw new ErrorResponse("Client name is required", 400);
     }
 
@@ -57,7 +72,8 @@ exports.createInvoice = async (req, res, next) => {
 
     const invoice = await Invoice.create({
       user: req.user._id,
-      clientName: clientName.trim(),
+      client: resolvedClientId,
+      clientName: resolvedClientName,
       invoiceNumber: invoiceNumber || generateInvoiceNumber(),
       amount: normalizedAmount,
       issuedAt: issuedDate,

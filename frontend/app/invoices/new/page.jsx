@@ -3,13 +3,16 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createInvoice } from "../../../lib/api";
+import { createInvoice, getClients } from "../../../lib/api";
 
 export default function NewInvoicePage() {
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [clients, setClients] = useState([]);
+  const [isLoadingClients, setIsLoadingClients] = useState(false);
+  const [selectedClientId, setSelectedClientId] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -19,6 +22,20 @@ export default function NewInvoicePage() {
     }
 
     setIsReady(true);
+
+    const loadClients = async () => {
+      setIsLoadingClients(true);
+      try {
+        const data = await getClients(token);
+        setClients(data?.clients || []);
+      } catch (error) {
+        setErrorMessage(error.message || "Unable to load clients.");
+      } finally {
+        setIsLoadingClients(false);
+      }
+    };
+
+    loadClients();
   }, [router]);
 
   const handleSubmit = async (event) => {
@@ -42,7 +59,7 @@ export default function NewInvoicePage() {
     const status = (formData.get("status") || "draft").toString();
     const notes = (formData.get("notes") || "").toString().trim();
 
-    if (!clientName) {
+    if (!selectedClientId && !clientName) {
       setErrorMessage("Client name is required.");
       return;
     }
@@ -66,7 +83,8 @@ export default function NewInvoicePage() {
 
     try {
       const payload = {
-        clientName,
+        clientId: selectedClientId || undefined,
+        clientName: !selectedClientId ? clientName : undefined,
         invoiceNumber: invoiceNumber || undefined,
         amount: amountValue,
         issuedAt,
@@ -128,11 +146,35 @@ export default function NewInvoicePage() {
       >
         <div className="grid gap-6 md:grid-cols-2">
           <label className="flex flex-col gap-2 text-sm">
+            <span className="font-semibold text-slate-700">Select client</span>
+            <select
+              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-base outline-none transition focus:border-slate-400"
+              value={selectedClientId}
+              onChange={(event) => setSelectedClientId(event.target.value)}
+            >
+              <option value="">Choose from saved clients</option>
+              {clients.map((client) => (
+                <option key={client._id} value={client._id}>
+                  {client.name}
+                </option>
+              ))}
+            </select>
+            {isLoadingClients && (
+              <span className="text-xs text-slate-500">Loading clients...</span>
+            )}
+          </label>
+
+          <label className="flex flex-col gap-2 text-sm">
             <span className="font-semibold text-slate-700">Client name</span>
             <input
               className="rounded-xl border border-slate-200 px-4 py-2.5 text-base outline-none transition focus:border-slate-400"
               name="clientName"
-              placeholder="Client or company"
+              placeholder={
+                selectedClientId
+                  ? "Client selected above"
+                  : "Client or company"
+              }
+              disabled={Boolean(selectedClientId)}
               required
             />
           </label>

@@ -140,6 +140,12 @@ export default function DashboardPage() {
               >
                 Create invoice
               </Link>
+              <Link
+                className="rounded-full border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400"
+                href="/clients"
+              >
+                View clients
+              </Link>
               <button className="rounded-full border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400">
                 Log a payment
               </button>
@@ -248,7 +254,7 @@ export default function DashboardPage() {
               >
                 <div>
                   <p className="text-sm font-semibold text-slate-900">
-                    {invoice.clientName}
+                    {invoice.client?.name || invoice.clientName}
                   </p>
                   <p className="mt-1 text-xs text-slate-500">
                     {invoice.invoiceNumber} • Due{" "}
@@ -287,7 +293,7 @@ export default function DashboardPage() {
                     key={invoice._id}
                     className="rounded-2xl border border-slate-100 bg-slate-50/60 px-4 py-3"
                   >
-                    {invoice.clientName} • {currency.format(invoice.amount)}
+                    {invoice.client?.name || invoice.clientName} • {currency.format(invoice.amount)}
                   </li>
                 ))}
               {!isLoading && overdueInvoices.length === 0 && (

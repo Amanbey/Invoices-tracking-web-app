@@ -6,6 +6,7 @@ const morgan = require("morgan");
 const connectDb = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const invoiceRoutes = require("./routes/invoiceRoutes");
+const clientRoutes = require("./routes/clientRoutes");
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(morgan("dev"));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/invoices", invoiceRoutes);
+app.use("/api/clients", clientRoutes);
 
 app.use((err, req, res, next) => {
   const status = err.statusCode || 500;

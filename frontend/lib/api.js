@@ -71,3 +71,36 @@ export const createInvoice = (token, payload) =>
     },
     body: JSON.stringify(payload),
   });
+
+export const getClients = (token) =>
+  request("/api/clients", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+export const createClient = (token, payload) =>
+  request("/api/clients", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+export const updateClient = (token, clientId, payload) =>
+  request(`/api/clients/${clientId}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+export const deleteClient = (token, clientId) =>
+  request(`/api/clients/${clientId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });

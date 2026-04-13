@@ -46,7 +46,7 @@ export default function InvoicesPage() {
 
   const filteredInvoices = useMemo(() => {
     return invoices.filter((invoice) => {
-      const client = invoice.clientName || "";
+      const client = invoice.client?.name || invoice.clientName || "";
       const invoiceNumber = invoice.invoiceNumber || "";
       const matchesQuery =
         client.toLowerCase().includes(query.toLowerCase()) ||
@@ -186,7 +186,7 @@ export default function InvoicesPage() {
               >
                 <div>
                   <p className="font-semibold text-slate-900">
-                    {invoice.clientName}
+                    {invoice.client?.name || invoice.clientName}
                   </p>
                   <p className="text-xs text-slate-500">
                     Due {new Date(invoice.dueAt).toLocaleDateString()}
