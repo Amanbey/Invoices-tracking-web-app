@@ -1,1 +1,43 @@
-rm -rf .git && git init && git add . && git commit -m "fresh push" && git branch -M main && git remote add origin https://github.com/Amanbey/Invoices-tracking-web-app.git && git config http.postBuffer 524288000 && git config http.lowSpeedLimit 0 && git config http.lowSpeedTime 999999 && git push -u origin maing
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 120,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      maxlength: 160,
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+    },
+  },
+  { timestamps: true }
+);
+
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    return next();
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
+
+userSchema.methods.comparePassword = function (candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
+};
+
+module.exports = mongoose.model("User", userSchema);
