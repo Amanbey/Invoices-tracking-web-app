@@ -1,0 +1,1 @@
+rm -rf .git && git init && git add . && git commit -m "fresh push" && git branch -M main && git remote add origin https://github.com/Amanbey/Invoices-tracking-web-app.git && git config http.postBuffer 524288000 && git config http.lowSpeedLimit 0 && git config http.lowSpeedTime 999999 && git push -u origin maing
