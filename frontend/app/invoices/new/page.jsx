@@ -49,7 +49,7 @@ export default function NewInvoicePage() {
     }
 
     const formData = new FormData(event.currentTarget);
-    const clientName = (formData.get("clientName") || "").toString().trim();
+    const productType = (formData.get("productType") || "").toString().trim();
     const invoiceNumber = (formData.get("invoiceNumber") || "")
       .toString()
       .trim();
@@ -59,8 +59,13 @@ export default function NewInvoicePage() {
     const status = (formData.get("status") || "draft").toString();
     const notes = (formData.get("notes") || "").toString().trim();
 
-    if (!selectedClientId && !clientName) {
-      setErrorMessage("Client name is required.");
+    if (!selectedClientId) {
+      setErrorMessage("Select a client to continue.");
+      return;
+    }
+
+    if (!productType) {
+      setErrorMessage("Product type is required.");
       return;
     }
 
@@ -83,8 +88,8 @@ export default function NewInvoicePage() {
 
     try {
       const payload = {
-        clientId: selectedClientId || undefined,
-        clientName: !selectedClientId ? clientName : undefined,
+        clientId: selectedClientId,
+        productType,
         invoiceNumber: invoiceNumber || undefined,
         amount: amountValue,
         issuedAt,
@@ -141,16 +146,18 @@ export default function NewInvoicePage() {
       </header>
 
       <form
-        className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm"
+        className="rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.8)]"
         onSubmit={handleSubmit}
       >
         <div className="grid gap-6 md:grid-cols-2">
-          <label className="flex flex-col gap-2 text-sm">
+          <label className="flex flex-col gap-2 text-sm" htmlFor="clientId">
             <span className="font-semibold text-slate-700">Select client</span>
             <select
-              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-base outline-none transition focus:border-slate-400"
+              id="clientId"
+              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-base text-slate-800 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
               value={selectedClientId}
               onChange={(event) => setSelectedClientId(event.target.value)}
+              required
             >
               <option value="">Choose from saved clients</option>
               {clients.map((client) => (
@@ -164,34 +171,32 @@ export default function NewInvoicePage() {
             )}
           </label>
 
-          <label className="flex flex-col gap-2 text-sm">
-            <span className="font-semibold text-slate-700">Client name</span>
+          <label className="flex flex-col gap-2 text-sm" htmlFor="productType">
+            <span className="font-semibold text-slate-700">Product type</span>
             <input
-              className="rounded-xl border border-slate-200 px-4 py-2.5 text-base outline-none transition focus:border-slate-400"
-              name="clientName"
-              placeholder={
-                selectedClientId
-                  ? "Client selected above"
-                  : "Client or company"
-              }
-              disabled={Boolean(selectedClientId)}
+              id="productType"
+              className="rounded-xl border border-slate-200 px-4 py-2.5 text-base text-slate-800 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+              name="productType"
+              placeholder="Website build, consulting, design"
               required
             />
           </label>
 
-          <label className="flex flex-col gap-2 text-sm">
+          <label className="flex flex-col gap-2 text-sm" htmlFor="invoiceNumber">
             <span className="font-semibold text-slate-700">Invoice number</span>
             <input
-              className="rounded-xl border border-slate-200 px-4 py-2.5 text-base outline-none transition focus:border-slate-400"
+              id="invoiceNumber"
+              className="rounded-xl border border-slate-200 px-4 py-2.5 text-base text-slate-800 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
               name="invoiceNumber"
               placeholder="Optional"
             />
           </label>
 
-          <label className="flex flex-col gap-2 text-sm">
+          <label className="flex flex-col gap-2 text-sm" htmlFor="amount">
             <span className="font-semibold text-slate-700">Amount</span>
             <input
-              className="rounded-xl border border-slate-200 px-4 py-2.5 text-base outline-none transition focus:border-slate-400"
+              id="amount"
+              className="rounded-xl border border-slate-200 px-4 py-2.5 text-base text-slate-800 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
               name="amount"
               type="number"
               min="0"
@@ -201,10 +206,11 @@ export default function NewInvoicePage() {
             />
           </label>
 
-          <label className="flex flex-col gap-2 text-sm">
+          <label className="flex flex-col gap-2 text-sm" htmlFor="status">
             <span className="font-semibold text-slate-700">Status</span>
             <select
-              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-base outline-none transition focus:border-slate-400"
+              id="status"
+              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-base text-slate-800 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
               name="status"
               defaultValue="draft"
             >
@@ -216,20 +222,22 @@ export default function NewInvoicePage() {
             </select>
           </label>
 
-          <label className="flex flex-col gap-2 text-sm">
+          <label className="flex flex-col gap-2 text-sm" htmlFor="issuedAt">
             <span className="font-semibold text-slate-700">Issued date</span>
             <input
-              className="rounded-xl border border-slate-200 px-4 py-2.5 text-base outline-none transition focus:border-slate-400"
+              id="issuedAt"
+              className="rounded-xl border border-slate-200 px-4 py-2.5 text-base text-slate-800 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
               name="issuedAt"
               type="date"
               required
             />
           </label>
 
-          <label className="flex flex-col gap-2 text-sm">
+          <label className="flex flex-col gap-2 text-sm" htmlFor="dueAt">
             <span className="font-semibold text-slate-700">Due date</span>
             <input
-              className="rounded-xl border border-slate-200 px-4 py-2.5 text-base outline-none transition focus:border-slate-400"
+              id="dueAt"
+              className="rounded-xl border border-slate-200 px-4 py-2.5 text-base text-slate-800 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
               name="dueAt"
               type="date"
               required
@@ -237,12 +245,13 @@ export default function NewInvoicePage() {
           </label>
         </div>
 
-        <label className="mt-6 flex flex-col gap-2 text-sm">
+        <label className="mt-6 flex flex-col gap-2 text-sm" htmlFor="notes">
           <span className="font-semibold text-slate-700">Notes</span>
           <textarea
-            className="min-h-[120px] rounded-xl border border-slate-200 px-4 py-3 text-base outline-none transition focus:border-slate-400"
+            id="notes"
+            className="min-h-[120px] rounded-xl border border-slate-200 px-4 py-3 text-base text-slate-800 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
             name="notes"
-            placeholder="Optional notes for the client"
+            placeholder="Optional internal notes"
           />
         </label>
 

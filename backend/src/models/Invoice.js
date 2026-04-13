@@ -23,6 +23,12 @@ const invoiceSchema = new mongoose.Schema(
       trim: true,
       maxlength: 40,
     },
+    productType: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 120,
+    },
     amount: {
       type: Number,
       required: true,

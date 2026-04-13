@@ -10,7 +10,7 @@ const resolveApiBase = () => {
   return "http://localhost:5001";
 };
 
-const API_BASE = resolveApiBase();
+export const API_BASE = resolveApiBase();
 
 const request = async (path, options = {}) => {
   let response;
@@ -35,6 +35,35 @@ const request = async (path, options = {}) => {
   }
 
   return data;
+};
+
+const requestForm = async (path, options = {}) => {
+  let response;
+
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      ...options,
+    });
+  } catch (error) {
+    throw new Error("Unable to reach the API server.");
+  }
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.message || "Request failed");
+  }
+
+  return data;
+};
+
+export const getAssetUrl = (path) => {
+  if (!path) {
+    return "";
+  }
+  if (path.startsWith("http://") || path.startsWith("https://")) {
+    return path;
+  }
+  return `${API_BASE}${path}`;
 };
 
 export const registerUser = (payload) =>
@@ -70,6 +99,24 @@ export const createInvoice = (token, payload) =>
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(payload),
+  });
+
+export const updateInvoice = (token, invoiceId, payload) =>
+  request(`/api/invoices/${invoiceId}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+export const updateProfile = (token, formData) =>
+  requestForm("/api/users/me", {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
   });
 
 export const getClients = (token) =>

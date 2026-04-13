@@ -28,7 +28,12 @@ exports.register = async (req, res, next) => {
     const token = createToken(user._id);
 
     res.status(201).json({
-      user: { id: user._id, name: user.name, email: user.email },
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        avatarUrl: user.avatarUrl,
+      },
       token,
     });
   } catch (error) {
@@ -55,7 +60,12 @@ exports.login = async (req, res, next) => {
 
     const token = createToken(user._id);
     res.status(200).json({
-      user: { id: user._id, name: user.name, email: user.email },
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        avatarUrl: user.avatarUrl,
+      },
       token,
     });
   } catch (error) {

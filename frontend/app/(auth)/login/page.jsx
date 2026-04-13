@@ -8,6 +8,9 @@ export default function LoginPage() {
       <p className="mt-2 text-slate-600">
         Sign in to manage invoices and payments.
       </p>
+      <div className="mt-6 rounded-lg border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+        Great to see you again. Let's keep your cash flow moving.
+      </div>
       <AuthForm mode="login" />
       <p className="mt-6 text-sm text-slate-600">
         New here?{" "}

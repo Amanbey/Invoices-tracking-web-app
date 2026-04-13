@@ -8,6 +8,9 @@ export default function RegisterPage() {
       <p className="mt-2 text-slate-600">
         Track your clients, invoices, and payments in one place.
       </p>
+      <div className="mt-6 rounded-lg border border-slate-100 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+        Welcome to your new billing command center. Start with your details.
+      </div>
       <AuthForm mode="register" />
       <p className="mt-6 text-sm text-slate-600">
         Already have an account?{" "}

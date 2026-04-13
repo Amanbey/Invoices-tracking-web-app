@@ -1,5 +1,6 @@
 import "../styles/globals.css";
 import { Fraunces, Space_Grotesk } from "next/font/google";
+import Navbar from "../components/nav/Navbar";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -22,6 +23,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${spaceGrotesk.variable} ${fraunces.variable} min-h-screen`}>
+        <Navbar />
         <main className="min-h-screen px-6 py-10">{children}</main>
       </body>
     </html>
