@@ -25,17 +25,17 @@ if (isProduction && process.env.JWT_SECRET === "change_this_secret") {
 
 connectDb();
 
-if (isProduction && !process.env.ALLOWED_ORIGINS) {
-  throw new Error("ALLOWED_ORIGINS is required in production");
-}
+const defaultAllowedOrigins = [
+  "http://localhost:3000",
+  "https://your-vercel-app-url.vercel.app",
+];
 
-const allowedOrigins = (
-  process.env.ALLOWED_ORIGINS ||
-  "http://localhost:3000,http://localhost:3001,http://localhost:3002"
-)
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || defaultAllowedOrigins.join(","))
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
+
+const allowAllOrigins = process.env.ALLOW_ALL_ORIGINS === "true";
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -52,13 +52,8 @@ app.use(
 app.use(limiter);
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-        return;
-      }
-      callback(new Error("Origin not allowed by CORS"));
-    },
+    origin: allowAllOrigins ? "*" : allowedOrigins,
+    credentials: true,
     methods: ["GET", "POST", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })

@@ -1,29 +1,12 @@
-const resolveApiBases = () => {
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return [process.env.NEXT_PUBLIC_API_URL];
-  }
+const API = process.env.NEXT_PUBLIC_API_URL;
 
-  if (process.env.NODE_ENV === "production") {
-    throw new Error(
-      "NEXT_PUBLIC_API_URL is required in production and must point to the deployed backend"
-    );
-  }
+if (!API && process.env.NODE_ENV === "production") {
+  throw new Error(
+    "NEXT_PUBLIC_API_URL is required in production and must point to the deployed backend"
+  );
+}
 
-  if (typeof window !== "undefined" && window.location?.hostname) {
-    const host = window.location.hostname;
-    return [
-      `http://${host}:5001`,
-      `http://${host}:5002`,
-      `http://${host}:5003`,
-    ];
-  }
-
-  return ["http://localhost:5001", "http://localhost:5002", "http://localhost:5003"];
-};
-
-export const API_BASES = resolveApiBases();
-export const API_BASE = API_BASES[0];
-let activeApiBase = API_BASE;
+export const API_BASE = API || "";
 
 const request = async (path, options = {}) => {
   const mergedHeaders = {
@@ -31,68 +14,30 @@ const request = async (path, options = {}) => {
     ...(options.headers || {}),
   };
 
-  let lastConnectionError = null;
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers: mergedHeaders,
+  });
 
-  for (const base of API_BASES) {
-    let response;
-
-    try {
-      response = await fetch(`${base}${path}`, {
-        ...options,
-        headers: mergedHeaders,
-      });
-    } catch (error) {
-      lastConnectionError = error;
-      continue;
-    }
-
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      throw new Error(data.message || "Request failed");
-    }
-
-    activeApiBase = base;
-
-    return data;
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.message || "Request failed");
   }
 
-  if (lastConnectionError) {
-    throw new Error("Unable to reach the API server.");
-  }
-
-  throw new Error("Request failed");
+  return data;
 };
 
 const requestForm = async (path, options = {}) => {
-  let lastConnectionError = null;
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...options,
+  });
 
-  for (const base of API_BASES) {
-    let response;
-
-    try {
-      response = await fetch(`${base}${path}`, {
-        ...options,
-      });
-    } catch (error) {
-      lastConnectionError = error;
-      continue;
-    }
-
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      throw new Error(data.message || "Request failed");
-    }
-
-    activeApiBase = base;
-
-    return data;
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.message || "Request failed");
   }
 
-  if (lastConnectionError) {
-    throw new Error("Unable to reach the API server.");
-  }
-
-  throw new Error("Request failed");
+  return data;
 };
 
 export const getAssetUrl = (path, cacheKey) => {
@@ -107,7 +52,7 @@ export const getAssetUrl = (path, cacheKey) => {
     return `${path}${separator}v=${encodeURIComponent(cacheKey)}`;
   }
 
-  const baseUrl = `${activeApiBase}${path}`;
+  const baseUrl = `${API_BASE}${path}`;
   if (cacheKey === undefined || cacheKey === null || cacheKey === "") {
     return baseUrl;
   }
