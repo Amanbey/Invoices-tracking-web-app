@@ -36,12 +36,22 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// ✅ FIXED CORS (allow all origins for now)
+// ✅ SECURE CORS (ONLY allow your frontend)
+const allowedOrigins = [
+  "http://localhost:3000",
+  process.env.FRONTEND_URL, // 👈 from Render env
+];
+
 app.use(
   cors({
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
   })
 );
 
@@ -62,7 +72,7 @@ app.use("/api/users", userRoutes);
 
 // ✅ Global error handler
 app.use((err, req, res, next) => {
-  console.error(err); // 👈 important for debugging
+  console.error(err);
 
   const status = err.statusCode || 500;
   res.status(status).json({

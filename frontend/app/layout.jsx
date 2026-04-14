@@ -1,6 +1,7 @@
 import "../styles/globals.css";
 import { Fraunces, Space_Grotesk } from "next/font/google";
 import Navbar from "../components/nav/Navbar";
+import { Toaster } from "react-hot-toast"; // ✅ added
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -25,6 +26,9 @@ export default function RootLayout({ children }) {
       <body className={`${spaceGrotesk.variable} ${fraunces.variable} min-h-screen`}>
         <Navbar />
         <main className="min-h-screen px-6 py-10">{children}</main>
+
+        {/* ✅ Toast container */}
+        <Toaster position="top-right" />
       </body>
     </html>
   );
