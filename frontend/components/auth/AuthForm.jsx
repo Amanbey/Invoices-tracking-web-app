@@ -132,7 +132,7 @@ export default function AuthForm({ mode }) {
           name="name"
           value={values.name}
           onChange={handleChange}
-          placeholder="Jane Doe"
+          placeholder="Enter your name"
         />
       )}
 
