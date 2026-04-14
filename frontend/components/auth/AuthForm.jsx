@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import AuthButton from "./AuthButton";
 import AuthInput from "./AuthInput";
-import { getCurrentUser, loginUser, registerUser } from "../../lib/api";
+
+const API = process.env.NEXT_PUBLIC_API_URL;
 
 const initialValues = {
   name: "",
@@ -38,15 +39,47 @@ export default function AuthForm({ mode }) {
     setIsLoading(true);
 
     try {
-      const action = isRegister ? registerUser : loginUser;
       const payload = isRegister
         ? values
         : { email: values.email, password: values.password };
-      const data = await action(payload);
+
+      if (!API) {
+        throw new Error("NEXT_PUBLIC_API_URL is not configured.");
+      }
+
+      const authUrl = isRegister
+        ? `${API}/api/auth/register`
+        : `${API}/api/auth/login`;
+
+      const response = await fetch(authUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.message || "Authentication failed.");
+      }
 
       if (data?.token) {
         localStorage.setItem("token", data.token);
-        const profile = await getCurrentUser(data.token);
+
+        const profileResponse = await fetch(`${API}/api/auth/me`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${data.token}`,
+          },
+        });
+
+        const profile = await profileResponse.json().catch(() => ({}));
+
+        if (!profileResponse.ok) {
+          throw new Error(profile.message || "Unable to load user profile.");
+        }
+
         if (profile?.user) {
           localStorage.setItem("user", JSON.stringify(profile.user));
         }
