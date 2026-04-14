@@ -5,17 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { deleteInvoice, getInvoices, updateInvoice } from "../../lib/api";
 
-const currency = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 0,
-});
-
 export default function InvoicesPage() {
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [currencyCode, setCurrencyCode] = useState("ETB");
   const [invoices, setInvoices] = useState([]);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -31,6 +26,16 @@ export default function InvoicesPage() {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isDeletingId, setIsDeletingId] = useState(null);
+
+  const currencyFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: currencyCode,
+        maximumFractionDigits: 0,
+      }),
+    [currencyCode]
+  );
 
   const inputClassName =
     "rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200";
@@ -71,6 +76,24 @@ export default function InvoicesPage() {
 
     loadInvoices();
   }, [router]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const loadCurrency = () => {
+      const storedCurrency = localStorage.getItem("currencyCode");
+      setCurrencyCode(storedCurrency === "USD" ? "USD" : "ETB");
+    };
+
+    loadCurrency();
+    window.addEventListener("currency-changed", loadCurrency);
+
+    return () => {
+      window.removeEventListener("currency-changed", loadCurrency);
+    };
+  }, []);
 
   const filteredInvoices = useMemo(() => {
     return invoices.filter((invoice) => {
@@ -338,7 +361,7 @@ export default function InvoicesPage() {
                     {new Date(invoice.issuedAt).toLocaleDateString()}
                   </div>
                   <div className="font-semibold text-slate-900">
-                    {currency.format(invoice.amount)}
+                    {currencyFormatter.format(invoice.amount)}
                   </div>
                   <div>
                     <span

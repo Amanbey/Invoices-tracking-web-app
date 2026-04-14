@@ -66,6 +66,14 @@ export default function AuthForm({ mode }) {
         throw new Error(data.message || "Authentication failed.");
       }
 
+      if (isRegister) {
+        toast.success("Account created successfully! Please log in.");
+        setMessage("Account created. Redirecting to login...");
+        setValues(initialValues);
+        router.push("/login");
+        return;
+      }
+
       if (data?.token) {
         localStorage.setItem("token", data.token);
 
@@ -88,9 +96,7 @@ export default function AuthForm({ mode }) {
         }
 
         // ✅ SUCCESS
-        toast.success(
-          isRegister ? "Account created successfully!" : "Login successful!"
-        );
+        toast.success("Login successful!");
 
         setMessage("Authentication successful. Redirecting...");
         router.push("/dashboard");

@@ -5,19 +5,24 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getCurrentUser, getInvoices } from "../../lib/api";
 
-const currency = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 0,
-});
-
 export default function DashboardPage() {
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
   const [userName, setUserName] = useState("");
+  const [currencyCode, setCurrencyCode] = useState("ETB");
   const [invoices, setInvoices] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const currencyFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: currencyCode,
+        maximumFractionDigits: 0,
+      }),
+    [currencyCode]
+  );
 
   useEffect(() => {
     const ensureSession = async () => {
@@ -51,6 +56,24 @@ export default function DashboardPage() {
 
     ensureSession();
   }, [router]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const loadCurrency = () => {
+      const storedCurrency = localStorage.getItem("currencyCode");
+      setCurrencyCode(storedCurrency === "USD" ? "USD" : "ETB");
+    };
+
+    loadCurrency();
+    window.addEventListener("currency-changed", loadCurrency);
+
+    return () => {
+      window.removeEventListener("currency-changed", loadCurrency);
+    };
+  }, []);
 
   const stats = useMemo(() => {
     const totalInvoices = invoices.length;
@@ -136,37 +159,37 @@ export default function DashboardPage() {
           </div>
 
           <div className="ui-card grid w-full max-w-sm grid-cols-1 gap-3 rounded-2xl bg-slate-900/95 p-4 text-white shadow-[0_18px_50px_-30px_rgba(15,23,42,0.9)] sm:grid-cols-2">
-            <div className="rounded-2xl bg-white/10 p-4">
+            <div className="min-w-0 rounded-2xl bg-white/10 p-4">
               <p className="text-xs uppercase tracking-[0.2em] text-white/70">
                 Paid total
               </p>
-              <p className="mt-2 text-2xl font-semibold">
-                {currency.format(stats.paidTotal || 0)}
+              <p className="mt-2 break-words text-xl font-semibold leading-tight sm:text-2xl">
+                {currencyFormatter.format(stats.paidTotal || 0)}
               </p>
               <p className="mt-2 text-xs text-white/70">
                 {stats.totalInvoices} invoices tracked
               </p>
             </div>
-            <div className="rounded-2xl bg-white/10 p-4">
+            <div className="min-w-0 rounded-2xl bg-white/10 p-4">
               <p className="text-xs uppercase tracking-[0.2em] text-white/70">
                 Outstanding
               </p>
-              <p className="mt-2 text-2xl font-semibold">
-                {currency.format(stats.outstandingTotal || 0)}
+              <p className="mt-2 break-words text-xl font-semibold leading-tight sm:text-2xl">
+                {currencyFormatter.format(stats.outstandingTotal || 0)}
               </p>
               <p className="mt-2 text-xs text-white/70">
                 {stats.overdueCount} overdue
               </p>
             </div>
-            <div className="col-span-2 rounded-2xl bg-gradient-to-r from-amber-300/20 via-white/5 to-sky-300/20 p-4">
+            <div className="col-span-1 rounded-2xl bg-gradient-to-r from-amber-300/20 via-white/5 to-sky-300/20 p-4 sm:col-span-2">
               <p className="text-xs uppercase tracking-[0.2em] text-white/70">
                 Draft invoices
               </p>
-              <div className="mt-2 flex items-center justify-between">
-                <p className="text-2xl font-semibold">
+              <div className="mt-2 flex items-center justify-between gap-3">
+                <p className="text-xl font-semibold leading-tight sm:text-2xl">
                   {stats.draftCount}
                 </p>
-                <p className="text-xs text-white/70">waiting to send</p>
+                <p className="text-right text-xs text-white/70">waiting to send</p>
               </div>
             </div>
           </div>
@@ -246,7 +269,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex items-center gap-4">
                   <p className="text-sm font-semibold text-slate-900">
-                    {currency.format(invoice.amount)}
+                    {currencyFormatter.format(invoice.amount)}
                   </p>
                   <span
                     className={`rounded-full px-3 py-1 text-xs font-semibold ${statusTone(
@@ -276,7 +299,7 @@ export default function DashboardPage() {
                     key={invoice._id}
                     className="ui-card rounded-2xl border border-slate-100 bg-slate-50/60 px-4 py-3"
                   >
-                    {invoice.client?.name || invoice.clientName} • {currency.format(invoice.amount)}
+                    {invoice.client?.name || invoice.clientName} • {currencyFormatter.format(invoice.amount)}
                   </li>
                 ))}
               {!isLoading && overdueInvoices.length === 0 && (

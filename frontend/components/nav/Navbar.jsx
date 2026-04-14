@@ -16,10 +16,21 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [user, setUser] = useState(null);
+  const [currencyCode, setCurrencyCode] = useState("ETB");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const isAuthRoute = pathname === "/login" || pathname === "/register";
   const menuRef = useRef(null);
+
+  const applyCurrency = (nextCurrency) => {
+    const normalized = nextCurrency === "USD" ? "USD" : "ETB";
+    setCurrencyCode(normalized);
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem("currencyCode", normalized);
+      window.dispatchEvent(new Event("currency-changed"));
+    }
+  };
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -70,6 +81,24 @@ export default function Navbar() {
     setIsMobileNavOpen(false);
     setIsMenuOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const loadCurrency = () => {
+      const storedCurrency = localStorage.getItem("currencyCode");
+      setCurrencyCode(storedCurrency === "USD" ? "USD" : "ETB");
+    };
+
+    loadCurrency();
+    window.addEventListener("currency-changed", loadCurrency);
+
+    return () => {
+      window.removeEventListener("currency-changed", loadCurrency);
+    };
+  }, []);
 
   const avatarUrl = useMemo(
     () => getAssetUrl(user?.avatarUrl || "", user?.updatedAt || ""),
@@ -126,6 +155,21 @@ export default function Navbar() {
             Invoices
           </Link>
         </nav>
+
+        <div className="ml-3 hidden lg:block">
+          <label className="sr-only" htmlFor="currency-desktop">
+            Select currency
+          </label>
+          <select
+            id="currency-desktop"
+            className="h-10 rounded-full border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-700 outline-none transition hover:border-slate-400 focus:border-slate-400"
+            value={currencyCode}
+            onChange={(event) => applyCurrency(event.target.value)}
+          >
+            <option value="ETB">ETB</option>
+            <option value="USD">USD</option>
+          </select>
+        </div>
 
         <button
           className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-300 text-slate-700 transition hover:border-slate-400 lg:hidden"
@@ -192,7 +236,7 @@ export default function Navbar() {
                     Profile
                   </Link>
                   <button
-                    className="flex w-full px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                    className="flex w-full px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-rose-50 hover:text-rose-700"
                     type="button"
                     onClick={handleLogout}
                   >
@@ -271,6 +315,27 @@ export default function Navbar() {
 
           <div className="mt-2 h-px w-full bg-slate-200" />
 
+          <div
+            className={`transition-all duration-500 ${
+              isMobileNavOpen
+                ? "translate-x-0 opacity-100 delay-200"
+                : "-translate-x-2 opacity-0"
+            }`}
+          >
+            <label className="sr-only" htmlFor="currency-mobile">
+              Select currency
+            </label>
+            <select
+              id="currency-mobile"
+              className="h-10 w-fit rounded-full border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-700 outline-none transition hover:border-slate-400"
+              value={currencyCode}
+              onChange={(event) => applyCurrency(event.target.value)}
+            >
+              <option value="ETB">ETB</option>
+              <option value="USD">USD</option>
+            </select>
+          </div>
+
           {user ? (
             <div className="flex flex-col gap-2">
               <Link
@@ -285,7 +350,7 @@ export default function Navbar() {
                 Profile
               </Link>
               <button
-                className={`inline-flex h-9 w-fit items-center justify-center self-start rounded-full bg-slate-900 px-3 text-xs font-semibold text-white transition-all duration-500 hover:bg-slate-800 sm:h-10 sm:px-4 sm:text-sm ${
+                className={`inline-flex h-9 w-fit items-center justify-center self-start rounded-full border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-700 transition-all duration-500 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 sm:h-10 sm:px-4 sm:text-sm ${
                   isMobileNavOpen
                     ? "translate-x-0 opacity-100 delay-[250ms]"
                     : "-translate-x-2 opacity-0"
