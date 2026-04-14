@@ -105,7 +105,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-8">
+    <div className="relative mx-auto flex w-full max-w-7xl flex-col gap-6 md:gap-8">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-24 right-4 h-56 w-56 rounded-full bg-amber-200/60 blur-3xl"
@@ -115,7 +115,7 @@ export default function DashboardPage() {
         className="pointer-events-none absolute left-6 top-32 h-72 w-72 rounded-full bg-sky-200/50 blur-3xl"
       />
 
-      <header className="ui-card relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50 p-8 shadow-[0_30px_70px_-55px_rgba(15,23,42,0.8)] backdrop-blur">
+      <header className="ui-card relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50 p-6 shadow-[0_30px_70px_-55px_rgba(15,23,42,0.8)] backdrop-blur sm:p-8">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
@@ -126,7 +126,7 @@ export default function DashboardPage() {
                 Welcome back, {userName}.
               </p>
             )}
-            <h1 className="mt-3 text-4xl font-semibold text-slate-900 md:text-5xl">
+            <h1 className="mt-3 text-2xl font-semibold text-slate-900 sm:text-3xl lg:text-4xl">
               <span className="font-display">Invoice clarity, every day.</span>
             </h1>
             <p className="mt-4 max-w-xl text-base text-slate-600">
@@ -135,7 +135,7 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className="ui-card grid w-full max-w-sm grid-cols-2 gap-3 rounded-2xl bg-slate-900/95 p-4 text-white shadow-[0_18px_50px_-30px_rgba(15,23,42,0.9)]">
+          <div className="ui-card grid w-full max-w-sm grid-cols-1 gap-3 rounded-2xl bg-slate-900/95 p-4 text-white shadow-[0_18px_50px_-30px_rgba(15,23,42,0.9)] sm:grid-cols-2">
             <div className="rounded-2xl bg-white/10 p-4">
               <p className="text-xs uppercase tracking-[0.2em] text-white/70">
                 Paid total
@@ -173,7 +173,7 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
         <div className="ui-card rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_18px_45px_-35px_rgba(15,23,42,0.65)]">
           <p className="text-sm font-semibold text-slate-600">Total invoices</p>
           <p className="mt-3 text-3xl font-semibold text-slate-900">
@@ -197,9 +197,9 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+      <section className="grid gap-4 md:gap-6 lg:grid-cols-[2fr_1fr]">
         <div className="ui-card rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_22px_55px_-45px_rgba(15,23,42,0.75)]">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-xl font-semibold text-slate-900">
                 <span className="font-display">Recent invoices</span>
@@ -209,7 +209,7 @@ export default function DashboardPage() {
               </p>
             </div>
             <Link
-              className="rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-400"
+              className="inline-flex h-10 items-center justify-center self-start rounded-full border border-slate-300 px-4 text-xs font-semibold text-slate-700 transition hover:border-slate-400"
               href="/invoices"
             >
               View all

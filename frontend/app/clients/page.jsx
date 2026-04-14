@@ -219,7 +219,7 @@ export default function ClientsPage() {
   }
 
   return (
-    <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-8">
+    <div className="relative mx-auto flex w-full max-w-7xl flex-col gap-6 md:gap-8">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-20 left-10 h-64 w-64 rounded-full bg-amber-200/50 blur-3xl"
@@ -229,13 +229,13 @@ export default function ClientsPage() {
         className="pointer-events-none absolute right-6 top-24 h-72 w-72 rounded-full bg-sky-200/40 blur-3xl"
       />
 
-      <header className="ui-card relative overflow-hidden rounded-3xl border border-slate-200 bg-white/80 p-8 shadow-sm backdrop-blur">
+      <header className="ui-card relative overflow-hidden rounded-3xl border border-slate-200 bg-white/80 p-6 shadow-sm backdrop-blur sm:p-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
               Clients
             </p>
-            <h1 className="mt-3 text-4xl font-semibold text-slate-900 md:text-5xl">
+            <h1 className="mt-3 text-2xl font-semibold text-slate-900 sm:text-3xl lg:text-4xl">
               <span className="font-display">Client relationships at a glance.</span>
             </h1>
             <p className="mt-4 max-w-xl text-base text-slate-600">
@@ -243,16 +243,16 @@ export default function ClientsPage() {
               faster when creating new invoices.
             </p>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap">
             <Link
-              className="rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+              className="inline-flex h-10 items-center justify-center rounded-full bg-slate-900 px-5 text-sm font-semibold text-white transition hover:bg-slate-800"
               href="/dashboard"
             >
               Back to dashboard
             </Link>
             <div className="relative">
               <button
-                className="rounded-full border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400"
+                className="inline-flex h-10 w-full items-center justify-center rounded-full border border-slate-300 px-5 text-sm font-semibold text-slate-700 transition hover:border-slate-400 sm:w-auto"
                 type="button"
                 onClick={() => setIsFormOpen((prev) => !prev)}
                 aria-expanded={isFormOpen}
@@ -267,8 +267,8 @@ export default function ClientsPage() {
 
       {isFormOpen && (
         <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-slate-900/30 px-4 py-10 backdrop-blur-sm">
-          <div className="ui-card w-full max-w-2xl rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_30px_80px_-50px_rgba(15,23,42,0.8)]">
-            <div className="flex items-center justify-between">
+          <div className="ui-card w-full max-w-2xl rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_30px_80px_-50px_rgba(15,23,42,0.8)] sm:p-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-slate-900">
                   <span className="font-display">Add new client</span>
@@ -278,7 +278,7 @@ export default function ClientsPage() {
                 </p>
               </div>
               <button
-                className="rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-400"
+                className="inline-flex h-10 items-center justify-center self-start rounded-full border border-slate-300 px-4 text-xs font-semibold text-slate-700 transition hover:border-slate-400"
                 type="button"
                 onClick={() => setIsFormOpen(false)}
               >
@@ -367,16 +367,16 @@ export default function ClientsPage() {
                 </p>
               )}
 
-              <div className="mt-6 flex flex-wrap gap-3">
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <button
-                  className="rounded-full bg-slate-900 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+                  className="inline-flex h-10 w-full items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 sm:w-auto"
                   type="submit"
                   disabled={isSaving}
                 >
                   {isSaving ? "Saving..." : "Save client"}
                 </button>
                 <button
-                  className="rounded-full border border-slate-300 px-6 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400"
+                  className="inline-flex h-10 w-full items-center justify-center rounded-full border border-slate-300 px-6 text-sm font-semibold text-slate-700 transition hover:border-slate-400 sm:w-auto"
                   type="button"
                   onClick={() => setIsFormOpen(false)}
                 >
@@ -388,7 +388,7 @@ export default function ClientsPage() {
         </div>
       )}
 
-      <section className="ui-card rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="ui-card rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div>
               <h2 className="text-xl font-semibold text-slate-900">
@@ -400,13 +400,13 @@ export default function ClientsPage() {
             </div>
             <div className="flex flex-1 flex-col gap-3 md:max-w-sm md:flex-row md:items-center md:justify-end">
               <input
-                className="w-full rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                className="h-10 w-full rounded-full border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
                 placeholder="Search by name or email"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
               />
               <select
-                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                className="h-10 rounded-full border border-slate-200 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
                 value={statusFilter}
                 onChange={(event) => setStatusFilter(event.target.value)}
               >
@@ -426,8 +426,8 @@ export default function ClientsPage() {
           </p>
         )}
 
-        <div className="mt-6 overflow-hidden rounded-2xl border border-slate-100">
-          <div className="grid grid-cols-1 gap-0 border-b border-slate-100 bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 md:grid-cols-[1.2fr_1.2fr_0.6fr_0.6fr]">
+        <div className="mt-6 overflow-x-auto rounded-2xl border border-slate-100">
+          <div className="hidden gap-0 border-b border-slate-100 bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 md:grid md:grid-cols-[1.2fr_1.2fr_0.6fr_0.6fr]">
             <span>Name</span>
             <span>Contact</span>
             <span>Status</span>
@@ -523,9 +523,9 @@ export default function ClientsPage() {
                           onChange={handleEditChange}
                         />
                       </label>
-                      <div className="md:col-span-2 flex flex-wrap gap-3">
+                      <div className="md:col-span-2 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                         <button
-                          className="rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-800"
+                          className="inline-flex h-10 w-full items-center justify-center rounded-full bg-slate-900 px-4 text-xs font-semibold text-white transition hover:bg-slate-800 sm:w-auto"
                           type="button"
                           onClick={() => handleUpdate(client._id)}
                           disabled={isSaving}
@@ -533,7 +533,7 @@ export default function ClientsPage() {
                           Save changes
                         </button>
                         <button
-                          className="rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-400"
+                          className="inline-flex h-10 w-full items-center justify-center rounded-full border border-slate-300 px-4 text-xs font-semibold text-slate-700 transition hover:border-slate-400 sm:w-auto"
                           type="button"
                           onClick={cancelEdit}
                         >
@@ -580,16 +580,16 @@ export default function ClientsPage() {
                         {client.status === "inactive" ? "Inactive" : "Active"}
                       </span>
                     </div>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                       <button
-                        className="h-7 rounded-[10px] bg-slate-900 px-3 text-[11px] font-semibold text-white transition-all duration-200 hover:bg-slate-800 hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2"
+                        className="h-10 rounded-[10px] bg-slate-900 px-4 text-xs font-semibold text-white transition-all duration-200 hover:bg-slate-800 hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2"
                         type="button"
                         onClick={() => startEdit(client)}
                       >
                         Edit
                       </button>
                       <button
-                        className="h-7 rounded-[10px] bg-rose-600 px-3 text-[11px] font-semibold text-white transition-all duration-200 hover:bg-rose-700 hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-rose-300 focus:ring-offset-2"
+                        className="h-10 rounded-[10px] bg-rose-600 px-4 text-xs font-semibold text-white transition-all duration-200 hover:bg-rose-700 hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-rose-300 focus:ring-offset-2"
                         type="button"
                         onClick={() => handleDelete(client._id)}
                         disabled={isSaving}

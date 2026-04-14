@@ -112,7 +112,7 @@ export default function NewInvoicePage() {
   }
 
   return (
-    <div className="relative mx-auto flex w-full max-w-4xl flex-col gap-8">
+    <div className="relative mx-auto flex w-full max-w-7xl flex-col gap-6 md:gap-8">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-24 right-10 h-64 w-64 rounded-full bg-amber-200/40 blur-3xl"
@@ -122,13 +122,13 @@ export default function NewInvoicePage() {
         className="pointer-events-none absolute left-6 top-32 h-72 w-72 rounded-full bg-sky-200/40 blur-3xl"
       />
 
-      <header className="ui-card relative overflow-hidden rounded-3xl border border-slate-200 bg-white/80 p-8 shadow-sm backdrop-blur">
+      <header className="ui-card relative overflow-hidden rounded-3xl border border-slate-200 bg-white/80 p-6 shadow-sm backdrop-blur sm:p-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
               New invoice
             </p>
-            <h1 className="mt-3 text-4xl font-semibold text-slate-900 md:text-5xl">
+            <h1 className="mt-3 text-2xl font-semibold text-slate-900 sm:text-3xl lg:text-4xl">
               <span className="font-display">Create a fresh invoice.</span>
             </h1>
             <p className="mt-4 text-base text-slate-600">
@@ -137,7 +137,7 @@ export default function NewInvoicePage() {
             </p>
           </div>
           <Link
-            className="rounded-full border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400"
+            className="inline-flex h-10 items-center justify-center self-start rounded-full border border-slate-300 px-5 text-sm font-semibold text-slate-700 transition hover:border-slate-400"
             href="/invoices"
           >
             Back to invoices
@@ -146,7 +146,7 @@ export default function NewInvoicePage() {
       </header>
 
       <form
-        className="ui-card rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.8)]"
+        className="ui-card rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-[0_20px_60px_-45px_rgba(15,23,42,0.8)] sm:p-8"
         onSubmit={handleSubmit}
       >
         <div className="grid gap-6 md:grid-cols-2">
@@ -261,16 +261,16 @@ export default function NewInvoicePage() {
           </p>
         )}
 
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <button
-            className="rounded-full bg-slate-900 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+            className="inline-flex h-10 w-full items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 sm:w-auto"
             type="submit"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Saving..." : "Create invoice"}
           </button>
           <Link
-            className="rounded-full border border-slate-300 px-6 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400"
+            className="inline-flex h-10 w-full items-center justify-center rounded-full border border-slate-300 px-6 text-sm font-semibold text-slate-700 transition hover:border-slate-400 sm:w-auto"
             href="/invoices"
           >
             Cancel

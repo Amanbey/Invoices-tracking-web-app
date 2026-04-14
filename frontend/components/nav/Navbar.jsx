@@ -17,6 +17,7 @@ export default function Navbar() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const isAuthRoute = pathname === "/login" || pathname === "/register";
   const menuRef = useRef(null);
 
@@ -65,6 +66,11 @@ export default function Navbar() {
     };
   }, [isMenuOpen]);
 
+  useEffect(() => {
+    setIsMobileNavOpen(false);
+    setIsMenuOpen(false);
+  }, [pathname]);
+
   const avatarUrl = useMemo(
     () => getAssetUrl(user?.avatarUrl || "", user?.updatedAt || ""),
     [user]
@@ -96,7 +102,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur transition-shadow duration-200 hover:shadow-sm">
-      <div className="mx-auto flex w-full max-w-6xl items-center px-6 py-4">
+      <div className="mx-auto flex w-full max-w-7xl items-center px-4 py-3 sm:px-6 lg:px-8">
         <Link className="flex items-center gap-3" href="/dashboard">
           <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-900 text-sm font-semibold text-white">
             IP
@@ -121,11 +127,38 @@ export default function Navbar() {
           </Link>
         </nav>
 
-        <div className="ml-4 flex items-center gap-3">
+        <button
+          className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-300 text-slate-700 transition hover:border-slate-400 lg:hidden"
+          type="button"
+          onClick={() => setIsMobileNavOpen((prev) => !prev)}
+          aria-expanded={isMobileNavOpen}
+          aria-controls="mobile-nav"
+          aria-label="Toggle navigation menu"
+        >
+          <span className="sr-only">Toggle navigation</span>
+          <svg
+            className={`h-5 w-5 transition-transform duration-300 ${
+              isMobileNavOpen ? "rotate-90" : "rotate-0"
+            }`}
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              d="M4 7H20M4 12H20M4 17H20"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+
+        <div className="ml-3 hidden items-center gap-3 lg:flex">
           {user ? (
             <div className="relative" ref={menuRef}>
               <button
-                className="flex items-center gap-3 rounded-full border border-slate-200 bg-white px-3 py-1.5 transition hover:border-slate-300"
+                className="flex h-10 items-center gap-3 rounded-full border border-slate-200 bg-white px-3 py-1.5 transition hover:border-slate-300"
                 type="button"
                 onClick={() => setIsMenuOpen((prev) => !prev)}
                 aria-haspopup="menu"
@@ -171,14 +204,111 @@ export default function Navbar() {
           ) : (
             <div className="flex items-center gap-2">
               <Link
-                className="rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-400"
+                className="inline-flex h-10 items-center rounded-full border border-slate-300 px-4 text-xs font-semibold text-slate-700 transition hover:border-slate-400"
                 href="/login"
               >
                 Sign in
               </Link>
               <Link
-                className="rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-800"
+                className="inline-flex h-10 items-center rounded-full bg-slate-900 px-4 text-xs font-semibold text-white transition hover:bg-slate-800"
                 href="/register"
+              >
+                Get started
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div
+        id="mobile-nav"
+        className={`overflow-hidden border-t border-slate-200 bg-white/95 backdrop-blur transition-all duration-500 ease-out lg:hidden ${
+          isMobileNavOpen
+            ? "max-h-[520px] translate-y-0 opacity-100"
+            : "max-h-0 -translate-y-2 opacity-0"
+        }`}
+      >
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 px-4 py-4 sm:px-6">
+          <Link
+            className={`${navLinkClass(
+              pathname === "/dashboard"
+            )} w-fit self-start px-3 py-1.5 text-xs transition-all duration-500 sm:px-4 sm:py-2 sm:text-sm ${
+              isMobileNavOpen
+                ? "translate-x-0 opacity-100 delay-75"
+                : "-translate-x-2 opacity-0"
+            }`}
+            href="/dashboard"
+            onClick={() => setIsMobileNavOpen(false)}
+          >
+            Dashboard
+          </Link>
+          <Link
+            className={`${navLinkClass(
+              pathname === "/clients"
+            )} w-fit self-start px-3 py-1.5 text-xs transition-all duration-500 sm:px-4 sm:py-2 sm:text-sm ${
+              isMobileNavOpen
+                ? "translate-x-0 opacity-100 delay-100"
+                : "-translate-x-2 opacity-0"
+            }`}
+            href="/clients"
+            onClick={() => setIsMobileNavOpen(false)}
+          >
+            Clients
+          </Link>
+          <Link
+            className={`${navLinkClass(
+              pathname === "/invoices"
+            )} w-fit self-start px-3 py-1.5 text-xs transition-all duration-500 sm:px-4 sm:py-2 sm:text-sm ${
+              isMobileNavOpen
+                ? "translate-x-0 opacity-100 delay-150"
+                : "-translate-x-2 opacity-0"
+            }`}
+            href="/invoices"
+            onClick={() => setIsMobileNavOpen(false)}
+          >
+            Invoices
+          </Link>
+
+          <div className="mt-2 h-px w-full bg-slate-200" />
+
+          {user ? (
+            <div className="flex flex-col gap-2">
+              <Link
+                className={`inline-flex h-9 w-fit items-center justify-center self-start rounded-full border border-slate-300 px-3 text-xs font-semibold text-slate-700 transition-all duration-500 hover:border-slate-400 sm:h-10 sm:px-4 sm:text-sm ${
+                  isMobileNavOpen
+                    ? "translate-x-0 opacity-100 delay-200"
+                    : "-translate-x-2 opacity-0"
+                }`}
+                href="/profile"
+                onClick={() => setIsMobileNavOpen(false)}
+              >
+                Profile
+              </Link>
+              <button
+                className={`inline-flex h-9 w-fit items-center justify-center self-start rounded-full bg-slate-900 px-3 text-xs font-semibold text-white transition-all duration-500 hover:bg-slate-800 sm:h-10 sm:px-4 sm:text-sm ${
+                  isMobileNavOpen
+                    ? "translate-x-0 opacity-100 delay-[250ms]"
+                    : "-translate-x-2 opacity-0"
+                }`}
+                type="button"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <Link
+                className="inline-flex h-10 items-center justify-center rounded-full border border-slate-300 px-4 text-sm font-semibold text-slate-700 transition hover:border-slate-400"
+                href="/login"
+                onClick={() => setIsMobileNavOpen(false)}
+              >
+                Sign in
+              </Link>
+              <Link
+                className="inline-flex h-10 items-center justify-center rounded-full bg-slate-900 px-4 text-sm font-semibold text-white transition hover:bg-slate-800"
+                href="/register"
+                onClick={() => setIsMobileNavOpen(false)}
               >
                 Get started
               </Link>
